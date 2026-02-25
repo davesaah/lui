@@ -6,7 +6,6 @@ from lib.database import create_session, register_document, save_message
 from lib.ollama_client import fetch_models, stream_response
 from lib.rag_utils import collection, get_vector_context, process_memory_file
 
-
 # Sidebar
 if st.sidebar.button("New chat", use_container_width=True):
     st.session_state.messages = []
@@ -19,20 +18,11 @@ model = st.sidebar.selectbox("Select model", fetch_models())
 st.sidebar.subheader("RAG options")
 use_full_rag = st.sidebar.checkbox("Use entire knowledge database")
 
-# rag_options = [None]
-# rag_options.extend(fetch_models())
-# rag_items = []
-# if not use_full_rag:
-#     rag_items = st.sidebar.multiselect("Select context", rag_options)
-
 # Centered title
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.subheader("What can I help you with?")
 
-# Initialize session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
 # Display previous chat messages
 for msg in st.session_state.messages:
