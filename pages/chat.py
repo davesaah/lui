@@ -1,12 +1,11 @@
 import threading
 import time
-
 import streamlit as st
-
 from client_tasks import update_title_task
 from lib.database import create_session, register_document, save_message
 from lib.ollama_client import fetch_models, stream_response
 from lib.rag_utils import collection, get_vector_context, process_memory_file
+
 
 # Sidebar
 if st.sidebar.button("New chat", use_container_width=True):
@@ -93,9 +92,9 @@ if prompt:
     # Get Context from RAG
     if use_full_rag and collection.count() > 0:
         context = get_vector_context(prompt.text)
-        full_prompt = f"""
-You are a helpful assistant. Use the provided context to answer the user's question.
-Always mention the filename you are referencing in your answer.
+        full_prompt = f"""You are a helpful assistant. Use the provided context
+to answer the user's question. Always mention the filename you are referencing
+in your answer.
 
 SNIPPET CONTEXT:
 {context}
@@ -131,7 +130,8 @@ USER QUESTION:
         start_time = time.perf_counter()
         with st.status("Thinking...", expanded=False) as status:
             response_stream = stream_response(
-                messages=st.session_state.messages, model=model, use_rag=use_full_rag
+                messages=st.session_state.messages, model=model,
+                use_rag=use_full_rag
             )
 
             # This consumes the first token while the status is still "Running"

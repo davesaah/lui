@@ -8,6 +8,7 @@ from chromadb.utils import embedding_functions
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from lib.database import delete_document_from_db
 
+
 # Setup Chroma + Ollama Embedding Function
 chroma_client = chromadb.PersistentClient(path="chroma_db")
 ollama_ef = embedding_functions.OllamaEmbeddingFunction(
@@ -68,8 +69,8 @@ def add_to_collection_in_batches(chunks, filename, batch_size=16):
 
         # Generate unique IDs for this batch
         # Using a combination of filename and index to prevent collisions
-        ids = [
-            f"{filename}_{i + j}_{str(uuid.uuid4())[:8]}" for j in range(len(batch))]
+        ids = [f"{filename}_{i + j}_{str(uuid.uuid4())[:8]}"
+               for j in range(len(batch))]
 
         # Metadata must match the length of the batch
         metadatas = [{"source": filename} for _ in range(len(batch))]

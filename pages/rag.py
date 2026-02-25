@@ -1,9 +1,9 @@
 import uuid
-
 import streamlit as st
-
 from lib.database import get_all_documents, register_document
-from lib.rag_utils import collection, process_memory_file, remove_document_completely
+from lib.rag_utils import collection, process_memory_file
+from lib.rag_utils import remove_document_completely
+
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:

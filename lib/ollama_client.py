@@ -7,8 +7,8 @@ def fetch_models() -> list[str]:
     """
     response = ollama.list()
 
-    # Extract the 'model' attribute from each object in the models list
-    # and filter out models containing 'embed' if you want to exclude embeddings
+    # Extract the 'model' attribute from each object in the models list and
+    # filter out models containing 'embed' if you want to exclude embeddings
     model_names = [
         m.model for m in response.models
         if 'embed' not in m.model
@@ -18,11 +18,6 @@ def fetch_models() -> list[str]:
 
 
 def stream_response(messages: list, model: str, use_rag: bool):
-    """
-    Messages should be a list of dictionaries: 
-    [{'role': 'user', 'content': '...'}, {'role': 'assistant', 'content': '...'}]
-    """
-
     stream = ollama.chat(
         model=model,
         messages=messages,  # full message history here
