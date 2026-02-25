@@ -70,14 +70,16 @@ prompt = st.chat_input(
 
 
 if prompt:
+    file_context = ""
     # Handle File Uploads
     if prompt.files:
         use_full_rag = True
         for uploaded_file in prompt.files:
             with st.spinner(f"Indexing {uploaded_file.name}..."):
-                chunks = process_memory_file(uploaded_file)
+                chunks, content = process_memory_file(uploaded_file)
                 if chunks:
                     register_document(uploaded_file.name, len(chunks))
+                    file_context = content
         st.toast(f"Indexed {len(prompt.files)} files to memory.")
 
     # Create a session in DB if it's a brand new conversation
@@ -95,8 +97,11 @@ if prompt:
 You are a helpful assistant. Use the provided context to answer the user's question.
 Always mention the filename you are referencing in your answer.
 
-CONTEXT:
+SNIPPET CONTEXT:
 {context}
+
+UPLOADED FILE CONTEXT:
+{file_context}
 
 USER QUESTION:
 {prompt.text}
@@ -137,7 +142,8 @@ USER QUESTION:
                 pass
 
             total_time = time.perf_counter() - start_time
-            status.update(label=f"Generated in {total_time:.2f}s", state="complete")
+            status.update(
+                label=f"Generated in {total_time:.2f}s", state="complete")
 
         # 3. Now show the text and stream the rest
         placeholder.markdown(full_response + "▌")
@@ -147,7 +153,9 @@ USER QUESTION:
 
         placeholder.markdown(full_response)
 
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    st.session_state.messages.append(
+        {"role": "assistant", "content": full_response})
 
     # Save assistant message to DB after stream completes
-    save_message(st.session_state.current_session_id, "assistant", full_response)
+    save_message(st.session_state.current_session_id,
+                 "assistant", full_response)

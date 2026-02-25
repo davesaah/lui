@@ -1,13 +1,11 @@
 import os
 import tempfile
 import uuid
-
 import chromadb
 import pymupdf.layout  # activate PyMuPDF-Layout in pymupdf
 import pymupdf4llm
 from chromadb.utils import embedding_functions
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 from lib.database import delete_document_from_db
 
 # Setup Chroma + Ollama Embedding Function
@@ -30,7 +28,7 @@ def process_memory_file(uploaded_file):
         # 1. Create a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(uploaded_file.getvalue())
-            tmp_path = tmp.name  # This is a real string path like '/tmp/xyz.pdf'
+            tmp_path = tmp.name  # example: '/tmp/xyz.pdf'
         try:
             # 2. Pass the PATH to the library
             content = pymupdf4llm.to_text(tmp_path)
@@ -51,7 +49,8 @@ def process_memory_file(uploaded_file):
             separators=["\nclass ", "\ndef ", "\nfunc ", "\n\n", "\n", " "],
         )
     else:
-        splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=200)
 
     chunks = splitter.split_text(content)
 
@@ -59,17 +58,18 @@ def process_memory_file(uploaded_file):
     if chunks:
         add_to_collection_in_batches(chunks, filename)
 
-    return chunks
+    return chunks, content
 
 
 def add_to_collection_in_batches(chunks, filename, batch_size=16):
     """Helper to push chunks to ChromaDB in manageable slices."""
     for i in range(0, len(chunks), batch_size):
-        batch = chunks[i : i + batch_size]
+        batch = chunks[i: i + batch_size]
 
         # Generate unique IDs for this batch
         # Using a combination of filename and index to prevent collisions
-        ids = [f"{filename}_{i + j}_{str(uuid.uuid4())[:8]}" for j in range(len(batch))]
+        ids = [
+            f"{filename}_{i + j}_{str(uuid.uuid4())[:8]}" for j in range(len(batch))]
 
         # Metadata must match the length of the batch
         metadatas = [{"source": filename} for _ in range(len(batch))]

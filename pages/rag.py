@@ -38,6 +38,7 @@ new_files = st.file_uploader(
         "yml",
         "html",
         "ts",
+        "pdf",
     ],
     key=st.session_state.uploader_key,
 )
@@ -49,10 +50,11 @@ if new_files:
                 status.write(f"Reading {uploaded_file.name}...")
 
                 # 1. Chunk in memory
-                chunks = process_memory_file(uploaded_file)
+                chunks, _ = process_memory_file(uploaded_file)
 
                 # 2. Add to ChromaDB
-                status.write(f"Generating embeddings for {len(chunks)} chunks...")
+                status.write(
+                    f"Generating embeddings for {len(chunks)} chunks...")
 
                 # 3. Save to SQLite tracker
                 register_document(uploaded_file.name, len(chunks))
