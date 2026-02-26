@@ -6,6 +6,7 @@ from lib.database import create_session, register_document, save_message
 from lib.ollama_client import fetch_models, stream_response
 from lib.rag_utils import collection, get_vector_context, process_memory_file
 
+
 # Sidebar
 if st.sidebar.button("New chat", use_container_width=True):
     st.session_state.messages = []
@@ -60,6 +61,7 @@ prompt = st.chat_input(
 
 if prompt:
     file_context = ""
+
     # Handle File Uploads
     if prompt.files:
         use_full_rag = True
@@ -95,6 +97,7 @@ UPLOADED FILE CONTEXT:
 USER QUESTION:
 {prompt.text}
 """
+
     st.chat_message("user").markdown(prompt.text)
     st.session_state.messages.append({"role": "user", "content": full_prompt})
 

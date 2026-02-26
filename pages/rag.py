@@ -44,7 +44,7 @@ new_files = st.file_uploader(
 )
 
 if new_files:
-    if st.button("🚀 Process and Index Files", use_container_width=True):
+    if st.button("Process and Index Files", use_container_width=True):
         with st.status("Indexing documents...", expanded=True) as status:
             for uploaded_file in new_files:
                 status.write(f"Reading {uploaded_file.name}...")
@@ -58,7 +58,7 @@ if new_files:
 
                 # 3. Save to SQLite tracker
                 register_document(uploaded_file.name, len(chunks))
-                status.write(f"✅ {uploaded_file.name} finished.")
+                status.write(f"{uploaded_file.name} finished.")
 
             status.update(label="Knowledge base updated!", state="complete")
 

@@ -5,6 +5,7 @@ from lib.database import init_db
 # Initialize DB
 init_db()
 
+# Initialize session state for messages and current_session_id
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "current_session_id" not in st.session_state:

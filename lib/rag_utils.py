@@ -23,26 +23,26 @@ collection = chroma_client.get_or_create_collection(
 
 def process_memory_file(uploaded_file):
     """Processes file buffer, chunks it, and adds to Chroma in batches."""
-    # process pdf with pymupdf4llm to preserve layout and extract text
     content = ""
-    if uploaded_file.name.lower().endswith(".pdf"):
-        # 1. Create a temporary file
+    filename = uploaded_file.name
+    ext = filename.split(".")[-1].lower()
+
+    # Handle PDFs
+    if ext == "pdf":
+        # Create a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(uploaded_file.getvalue())
             tmp_path = tmp.name  # example: '/tmp/xyz.pdf'
         try:
-            # 2. Pass the PATH to the library
+            # Pass the PATH to the library
             content = pymupdf4llm.to_text(tmp_path)
         finally:
-            # 3. Clean up the file after reading
+            # Clean up the file after reading
             os.remove(tmp_path)
     else:
         content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
 
-    filename = uploaded_file.name
-    ext = filename.split(".")[-1].lower()
-
-    # 1. Define Splitting Logic
+    # Handle code files
     if ext in ["py", "js", "ts", "go", "cpp", "c", "sql", "html", "vue"]:
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=1200,
@@ -55,7 +55,7 @@ def process_memory_file(uploaded_file):
 
     chunks = splitter.split_text(content)
 
-    # 2. Add to Collection using Batches
+    # Add to chroma DB in Batches
     if chunks:
         add_to_collection_in_batches(chunks, filename)
 
@@ -67,8 +67,7 @@ def add_to_collection_in_batches(chunks, filename, batch_size=16):
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i: i + batch_size]
 
-        # Generate unique IDs for this batch
-        # Using a combination of filename and index to prevent collisions
+        # Generate unique IDs for this batch to prevent collisions
         ids = [f"{filename}_{i + j}_{str(uuid.uuid4())[:8]}"
                for j in range(len(batch))]
 
@@ -84,7 +83,7 @@ def get_vector_context(query):
     results = collection.query(
         query_texts=[query],
         n_results=3,
-        include=["documents", "metadatas"],  # Explicitly include metadata
+        include=["documents", "metadatas"],
     )
 
     docs = results.get("documents", [[]])[0]
@@ -94,7 +93,7 @@ def get_vector_context(query):
     for doc, meta in zip(docs, metas):
         source_file = meta.get("source", "Unknown File")
         # Format each chunk with its filename header
-        context_chunks.append(f"--- SOURCE: {source_file} ---\n{doc}")
+        context_chunks.append(f"\n--- SOURCE: {source_file} ---\n{doc}")
 
     return "\n\n".join(context_chunks) if context_chunks else ""
 

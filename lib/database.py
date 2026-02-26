@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 
+
 DB_NAME = "chat_history.db"
 
 

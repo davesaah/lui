@@ -3,7 +3,7 @@ import ollama
 
 def fetch_models() -> list[str]:
     """
-    Fetch available Ollama models (excluding embeddings).
+    Fetch available Ollama models excluding embeddings
     """
     response = ollama.list()
 

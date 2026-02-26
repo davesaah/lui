@@ -8,7 +8,7 @@ def run(messages, session_id, model):
         chat_context = "\n".join(
             [f"{m['role']}: {m['content']}" for m in messages])
 
-        res = ollama.chat(
+        response = ollama.chat(
             model=model,
             messages=[{
                 "role": "user",
@@ -17,10 +17,8 @@ def run(messages, session_id, model):
             }]
         )
 
-        generated_title = res['message']['content'].strip().split('\n')[
-            0].replace('"', '')
+        generated_title = response['message']['content']
 
-        # Update database directly
         if session_id:
             update_session_title(session_id, generated_title)
     except Exception as e:
