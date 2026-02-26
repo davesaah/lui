@@ -7,13 +7,17 @@ import pymupdf4llm
 from chromadb.utils import embedding_functions
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from lib.database import delete_document_from_db
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 # Setup Chroma + Ollama Embedding Function
-chroma_client = chromadb.PersistentClient(path="chroma_db")
+chroma_client = chromadb.PersistentClient(path=os.getenv('CHROMA_DB_PATH'))
 ollama_ef = embedding_functions.OllamaEmbeddingFunction(
-    model_name="nomic-embed-text",
-    url="http://localhost:11434/api/embeddings",
+    model_name=os.getenv('EMBEDDING_MODEL'),
+    url=os.getenv('OLLAMA_EMBEDDING_URL'),
 )
 
 collection = chroma_client.get_or_create_collection(

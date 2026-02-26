@@ -1,12 +1,14 @@
 import sqlite3
+import os
 from datetime import datetime
+from dotenv import load_dotenv
 
-
-DB_NAME = "chat_history.db"
+# Load environment variables from .env file
+load_dotenv()
 
 
 def init_db():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     # Table for sessions (the "folders" for chats)
     c.execute("""CREATE TABLE IF NOT EXISTS sessions
@@ -30,7 +32,7 @@ def init_db():
 
 
 def create_session(title="New Chat"):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     c.execute(
         "INSERT INTO sessions (title, created_at) VALUES (?, ?)",
@@ -43,7 +45,7 @@ def create_session(title="New Chat"):
 
 
 def save_message(session_id, role, content):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     c.execute(
         "INSERT INTO messages (session_id, role, content, timestamp)"
@@ -56,7 +58,7 @@ def save_message(session_id, role, content):
 
 
 def get_all_sessions():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     c.execute("""SELECT id, title, created_at FROM sessions ORDER BY
                created_at DESC""")
@@ -66,7 +68,7 @@ def get_all_sessions():
 
 
 def get_messages(session_id):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     c.execute(
         "SELECT role, content FROM messages WHERE session_id = ?"
@@ -80,7 +82,7 @@ def get_messages(session_id):
 
 
 def update_session_title(session_id, new_title):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     c.execute("UPDATE sessions SET title = ? WHERE id = ?",
               (new_title, session_id))
@@ -89,7 +91,7 @@ def update_session_title(session_id, new_title):
 
 
 def delete_session(session_id):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     try:
         # Delete messages first (Foreign Key cleanup)
@@ -105,7 +107,7 @@ def delete_session(session_id):
 
 
 def register_document(filename, chunk_count):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     c.execute(
         """INSERT OR REPLACE INTO documents
@@ -117,7 +119,7 @@ def register_document(filename, chunk_count):
 
 
 def get_all_documents():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     c.execute("SELECT filename, chunk_count, uploaded_at FROM documents")
     rows = c.fetchall()
@@ -126,7 +128,7 @@ def get_all_documents():
 
 
 def delete_document_from_db(filename):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(os.getenv('SQLITE_DB_PATH'))
     c = conn.cursor()
     try:
         c.execute("DELETE FROM documents WHERE filename = ?", (filename,))
