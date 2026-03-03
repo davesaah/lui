@@ -3,3 +3,4 @@ chroma_db*
 lib/__pycache__*
 client_tasks/__pycache__*
 .env
+.venv
